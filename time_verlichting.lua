@@ -32,15 +32,16 @@ if (
 	isTime( { hour = 1, min = 30 } )
 	and otherdevices['Tuin Lampen'] == 'On'
 ) then
-	addCommand( "Tuin Lampen", "Off" )
+	addCommand( "Tuin Lampen", "Off FOR 0.7 SECONDS REPEAT -5 INTERVAL 0.7 SECONDS" )
 end
 
+-- Als de lamp handmatig is aangezet moet deze ook uitgezet worden na verloop van tijd.
 if (
 	otherdevices['Entree Lamp'] == 'On'
 	and otherdevices['$Entree Sensor Activiteit'] == 'Off'
 ) then
 	if ( timeOffset( otherdevices_lastupdate['Entree Lamp'] ) / 60 >= 15 ) then
-		addCommand( 'Entree Lamp', 'Off' )
+		addCommand( 'Entree Lamp', 'Off FOR 0.7 SECONDS REPEAT -3 INTERVAL 0.7 SECONDS' )
 	end
 end
 
@@ -49,7 +50,7 @@ if (
 	and otherdevices['$Keuken Sensor Activiteit'] == 'Off'
 ) then
 	-- De keukenlamp staat aan terwijl er geen activiteit rond de keuken is waargenomen. Kan deze uit?
-	local iMaxAanTijd = 60
+	local iMaxAanTijd = 45
 	if (
 		tonumber( otherdevices_svalues['Keuken Sensor Lichtsterkte'] ) > 80 -- flink veel licht in de keuken regio
 		or (
@@ -68,8 +69,17 @@ end
 if ( otherdevices['Garage Lampen'] == 'On' ) then
 	local iMaxAanTijd = 30
 	if ( otherdevices['$Achterdeur Sensor'] == 'Closed' ) then
-		-- Als de deur per ongeluk dicht valt bij het pakken van bier of wijn, langer aan is dan wel fijn.
 		iMaxAanTijd = 3
+	end
+	if (
+		oDatetime.hour >= 9
+		and oDatetime.hour <= 17
+		and (
+			oDatetime.wday == 7
+			or oDatetime.wday == 1
+		)
+	) then
+		iMaxAanTijd = 60
 	end
 	if ( timeOffset( otherdevices_lastupdate['Garage Lampen'] ) / 60 >= iMaxAanTijd ) then
 		addCommand( 'Garage Lampen', 'Off' )

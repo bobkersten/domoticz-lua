@@ -44,13 +44,13 @@
 ---------------------------------------------------------------------------------------------------------------------------
 -- Domoticz and Heating Database Locations
 ---------------------------------------------------------------------------------------------------------------------------
-local sDatabaseDomoticz = '/var/domoticz/domoticz.db'																-- The location of the domoticz database
-local sDatabaseCustom = '/var/domoticz/domoticz.custom.db'															-- The location of the custom database (where deltas are stored)
+local sDatabaseDomoticz = '/home/bob/domoticz-data/domoticz.db'																-- The location of the domoticz database
+local sDatabaseCustom = '/home/bob/domoticz-data/domoticz.custom.db'															-- The location of the custom database (where deltas are stored)
 ---------------------------------------------------------------------------------------------------------------------------
 -- Domoticz Device Names & Variables
 ---------------------------------------------------------------------------------------------------------------------------
 local aThermostatDeviceNames = { 'Woonkamer Thermostaat', 'Badkamer Thermostaat', 'Entree Thermostaat' }			-- An array with the names of the thermostat pseudo devices above
-local aThermostatWeights = { 6, 2, 1 }																				-- The priorities for the thermostats
+local aThermostatWeights = { 12, 4, 1 }																				-- The priorities for the thermostats
 local aTemperatureDeviceNames = { 'Woonkamer Temperatuur', 'Badkamer Temperatuur', 'Entree Sensor Temperatuur' }	-- An array with temperature sensor names that correspond to the thermostats above
 local aValvesDeviceNames = { 'Vloerverwarming Pomp Schakelaar', nil, nil }											-- An array with comma separated valve device names.
 local aPreHeat = { true, true, false }																				-- Wether or not to pre-heat the zone
@@ -199,13 +199,13 @@ for iThermostatIndex = 1, #aThermostatDeviceNames do
 				oCurrentTimer = { deviceid = iThermostatDeviceId, device = aThermostatDeviceNames[iThermostatIndex], timerid = tonumber( aTimers[iTimerIndex][2] ), setpoint = tonumber( aTimers[iTimerIndex][3] ), time = aTimers[iTimerIndex][4], minutes = round( tonumber( aTimers[iTimerIndex][5] ) ), hash = aTimers[iTimerIndex][6], temperature = fTemperatureCurrent, preheat = 0 }
 			end
 
-			log( 'The current timer started at ' .. oCurrentTimer.time .. ' (' .. tostring( math.abs( oCurrentTimer.minutes ) ) .. ' minutes ago) with setpoint ' .. tostring( oCurrentTimer.setpoint ) .. '°C.', oCurrentTimer.device )
+			log( 'The current timer started at ' .. oCurrentTimer.time .. ' (' .. tostring( math.abs( oCurrentTimer.minutes ) ) .. ' minutes ago) with setpoint ' .. tostring( oCurrentTimer.setpoint ) .. 'C.', oCurrentTimer.device )
 			if ( oCurrentTimer.setpoint ~= fThermostatSetPoint ) then
 				oCurrentTimer.setpoint = fThermostatSetPoint
 				oCurrentTimer.hash = nil
-				log( 'The current timer is manually overridden with temperature ' .. tostring( fThermostatSetPoint ) .. '°C.', oCurrentTimer.device )
+				log( 'The current timer is manually overridden with temperature ' .. tostring( fThermostatSetPoint ) .. 'C.', oCurrentTimer.device )
 			end
-			log( 'The next timer will start at ' .. oNextTimer.time .. ' (in ' .. tostring( oNextTimer.minutes ) .. ' minutes) with setpoint ' .. tostring( oNextTimer.setpoint ) .. '°C.', oNextTimer.device )
+			log( 'The next timer will start at ' .. oNextTimer.time .. ' (in ' .. tostring( oNextTimer.minutes ) .. ' minutes) with setpoint ' .. tostring( oNextTimer.setpoint ) .. 'C.', oNextTimer.device )
 
 			local oActiveTimer = oCurrentTimer
 
@@ -242,13 +242,13 @@ for iThermostatIndex = 1, #aThermostatDeviceNames do
 				if ( mDeltaAvg ) then
 					local iPreheatMinutes = round( ( ( oNextTimer.setpoint - oActiveTimer.temperature ) / tonumber( mDeltaAvg ) ) + tonumber( sOffsetAvg ) )
 					local sDebug = 'round( ( ( ' .. tostring( oNextTimer.setpoint ) .. ' - ' .. tostring( oActiveTimer.temperature ) .. ' ) / ' .. mDeltaAvg .. ' ) + ' .. sOffsetAvg .. ' )'
-					log( 'Heating from ' .. tostring( oActiveTimer.temperature ) .. '°C to ' .. tostring( oNextTimer.setpoint ) .. '°C at ' .. oNextTimer.time .. ' with outside temp of ' .. tostring( iTemperatureOutside ) .. '°C requires ' .. tostring( iPreheatMinutes ) .. ' minutes pre-heating.', oNextTimer.device )
+					log( 'Heating from ' .. tostring( oActiveTimer.temperature ) .. 'C to ' .. tostring( oNextTimer.setpoint ) .. 'C at ' .. oNextTimer.time .. ' with outside temp of ' .. tostring( iTemperatureOutside ) .. 'C requires ' .. tostring( iPreheatMinutes ) .. ' minutes pre-heating.', oNextTimer.device )
 					if ( oNextTimer.minutes <= iPreheatMinutes ) then
 						if ( sTimerHash ~= oNextTimer.hash ) then
 							log( 'Using deltas from timer ' .. sTimerHash .. ' instead of timer ' .. oNextTimer.hash .. '.', oNextTimer.device )
 						end
 						if ( tonumber( sDeltaTemperatureOutside ) ~= iTemperatureOutside ) then
-							log( 'Using deltas with outside temperature of ' .. sDeltaTemperatureOutside .. '°C instead of ' .. iTemperatureOutside .. '°C.', oNextTimer.device )
+							log( 'Using deltas with outside temperature of ' .. sDeltaTemperatureOutside .. 'C instead of ' .. iTemperatureOutside .. 'C.', oNextTimer.device )
 						end
 						oActiveTimer = oNextTimer
 						oActiveTimer.preheat = iPreheatMinutes
@@ -281,6 +281,14 @@ for iThermostatIndex = 1, #aThermostatDeviceNames do
 			oActiveTimer.low = ( oActiveTimer.setpoint < oActiveTimer.avg )
 			oActiveTimer.diff = 0
 			if (
+				oActiveTimer.preheat == 0
+				and oActiveTimer.high
+				and otherdevices['Iemand Aanwezig'] == 'Off'
+			) then
+				oActiveTimer.setpoint = oActiveTimer.setpoint - 2
+				log( "Setpoint is adjusted downwards because there's nobody home.", oActiveTimer.device )
+			end
+			if (
 				oActiveTimer.high
 				or (
 					oActiveTimer.low
@@ -291,9 +299,9 @@ for iThermostatIndex = 1, #aThermostatDeviceNames do
 				oActiveTimer.diff = round( ( oActiveTimer.setpoint - oActiveTimer.temperature ) * iWeight, 2 )
 				oHeating.diff = oHeating.diff + oActiveTimer.diff
 				oHeating.weights = oHeating.weights + iWeight
-				log( "Temperature is " .. tostring( oActiveTimer.temperature ) .. "°C and should be " .. tostring( oActiveTimer.setpoint ) .. '°C causing an diff of ' .. tostring( oActiveTimer.diff ) .. '.', oActiveTimer.device )
+				log( "Temperature is " .. tostring( oActiveTimer.temperature ) .. "C and should be " .. tostring( oActiveTimer.setpoint ) .. 'C causing an diff of ' .. tostring( oActiveTimer.diff ) .. '.', oActiveTimer.device )
 			else
-				log( "Temperature is " .. tostring( oActiveTimer.temperature ) .. "°C and should be " .. tostring( oActiveTimer.setpoint ) .. '°C and is ignored.', oActiveTimer.device )
+				log( "Temperature is " .. tostring( oActiveTimer.temperature ) .. "C and should be " .. tostring( oActiveTimer.setpoint ) .. 'C and is ignored.', oActiveTimer.device )
 			end
 
 			-- Opening or closing valves should help to reduce the weighted diff as soon as possible.
@@ -385,7 +393,7 @@ for iActiveTimerIndex = 1, #aActiveTimers do
 				"]] .. sDebug .. [["
 			)
 		]] )
-		log( 'New measurement started with start temperature ' .. tostring( oActiveTimer.temperature ) .. '°C.', oActiveTimer.device )
+		log( 'New measurement started with start temperature ' .. tostring( oActiveTimer.temperature ) .. 'C.', oActiveTimer.device )
 	end
 
 	if ( mTimerId ) then
@@ -412,7 +420,7 @@ for iActiveTimerIndex = 1, #aActiveTimers do
 					SET `StartDelay`=]] .. tostring( iDuration ) .. [[
 					WHERE `Id`=]] .. mTimerId .. [[
 				]] )
-				log( 'Measurement updated with startdelay ' .. tostring( iDuration ) .. ' at temperature ' .. tostring( oActiveTimer.temperature ) .. '°C.', oActiveTimer.device )
+				log( 'Measurement updated with startdelay ' .. tostring( iDuration ) .. ' at temperature ' .. tostring( oActiveTimer.temperature ) .. 'C.', oActiveTimer.device )
 			end
 
 			-- When the target temperature has been reached the measurement needs to be updated and closed.
@@ -431,7 +439,7 @@ for iActiveTimerIndex = 1, #aActiveTimers do
 						`Delta`=]] .. tostring( fDelta ) .. [[
 						WHERE `Id`=]] .. mTimerId .. [[
 					]] )
-					log( 'Measurement stopped with end temperature ' .. tostring( oActiveTimer.temperature ) .. '°C.', oActiveTimer.device )
+					log( 'Measurement stopped with end temperature ' .. tostring( oActiveTimer.temperature ) .. 'C.', oActiveTimer.device )
 				else
 					executeQuery( sDatabaseCustom, [[
 						DELETE FROM `Timer_Deltas`
@@ -467,13 +475,13 @@ end
 
 for iValveIndex = 1, #oHeating.valves.on do
 	if ( otherdevices[oHeating.valves.on[iValveIndex]] ~= 'On' ) then
-		addCommand( oHeating.valves.on[iValveIndex], 'On' )
+		addCommand( oHeating.valves.on[iValveIndex], 'On REPEAT 3 INTERVAL 5 SECONDS RANDOM 5' )
 		log( 'Valve "' .. oHeating.valves.on[iValveIndex] .. '" is opened.' )
 	end
 end
 for iValveIndex = 1, #oHeating.valves.off do
 	if ( otherdevices[oHeating.valves.on[iValveIndex]] ~= 'Off' ) then
-		addCommand( oHeating.valves.off[iValveIndex], 'Off' )
+		addCommand( oHeating.valves.off[iValveIndex], 'Off REPEAT 3 INTERVAL 5 SECONDS RANDOM 5' )
 		log( 'Valve "' .. oHeating.valves.off[iValveIndex] .. '" is closed.' )
 	end
 end

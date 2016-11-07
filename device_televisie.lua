@@ -1,9 +1,9 @@
 if ( devicechanged['Home Cinema Power Off'] == 'Off' ) then -- Home Cinema wordt AAN gezet (stand uit = off :-))
-	addCommand( '$Versterker', 'On', 3, 3 )
+	addCommand( '$Versterker', 'On REPEAT 3 INTERVAL 5 SECONDS RANDOM 5 SECONDS' )
 end
 
 if ( devicechanged['Home Cinema Power Off'] == 'On' ) then -- Home Cinema wordt UIT gezet
-	addCommand( '$Versterker', 'Off', 3, 3 )
+	addCommand( '$Versterker', 'Off REPEAT 3 INTERVAL 5 SECONDS RANDOM 5 SECONDS' )
 	if (
 		oDatetime.hour >= 21 or oDatetime.hour < 3
 		and otherdevices['Alarm'] == 'Off'

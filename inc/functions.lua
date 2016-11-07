@@ -149,30 +149,8 @@ function split( sStr_, sSep_ )
 	return t
 end
 
-function addCommand( sDevice_, sCommand_, iRepeat_, iDelay_, iWait_ )
-	iRepeat_ = iRepeat_ or 1
-	iDelay_ = iDelay_ or 0
-	iWait_ = iWait_ or 0
-	for iIndex = 1, iRepeat_ do
-		if ( iWait_ == 0 and ( iIndex == 1 or iDelay_ == 0 ) ) then
-			commandArray[#commandArray + 1] = { [ sDevice_ ] = sCommand_ }
-		else
-			commandArray[#commandArray + 1] = { [ sDevice_ ] = sCommand_ .. ' AFTER ' .. ( iWait_ + ( iDelay_ *  iIndex ) ) }
-		end
-	end
-end
-
-function setCommand( sDevice_, sCommand_, iRepeat_, iDelay_, iWait_ )
-	addCommand( sDevice_, sCommand_, iRepeat_, iDelay_, iWait_, true )
-end
-
-function toggle( sDevice_, iWait_, bExclusive_ )
-	iWait_ = iWait_ or 0
-	if ( otherdevices[sDevice_] == 'Off' ) then
-		addCommand( sDevice_, 'On', 1, 0, iWait_, bExclusive_ )
-	else
-		addCommand( sDevice_, 'Off', 1, 0, iWait_, bExclusive_ )
-	end
+function addCommand( sDevice_, sCommand_ )
+	commandArray[#commandArray + 1] = { [ sDevice_ ] = sCommand_ }
 end
 
 function round( fNum_, iDecimals_ )

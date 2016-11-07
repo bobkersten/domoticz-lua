@@ -28,7 +28,7 @@ if (
 	and tonumber( otherdevices_svalues['Entree Sensor Temperatuur'] ) >= 25
 	and tonumber( otherdevices_svalues['Entree Sensor Lichtsterkte'] ) > 1000
 ) then
-	addCommand( "Entree Ventilator", "On", 3, 5 )
+	addCommand( "Entree Ventilator", "On REPEAT 3 INTERVAL 5 SECONDS RANDOM 5 SECONDS" )
 end
 
 if (
@@ -38,5 +38,5 @@ if (
 		or tonumber( otherdevices_svalues['Entree Sensor Lichtsterkte'] ) <= 1000
 	)
 ) then
-	addCommand( "Entree Ventilator", "Off", 3, 5 )
+	addCommand( "Entree Ventilator", "Off REPEAT 3 INTERVAL 5 SECONDS RANDOM 5 SECONDS" )
 end

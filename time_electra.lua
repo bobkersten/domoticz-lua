@@ -4,7 +4,7 @@
 local aSuccessPrefix = { 'Yahooooooo!!', 'Goed nieuws.', 'Tadaaaa.', 'Hoppakee dan!', 'Yesssss.', 'Lekker weertje, of niet?', 'BAM!' }
 local aAlmostSuccessPrefix = { 'Oeeeej bijna.', 'Dat scheelt niet veel.', 'Kak. Net niet.', 'Niet slecht.', 'Toch een van de betere dagen.', 'Bijna.' }
 local aFailurePrefix = { 'Sjonge jonge jonge.', 'Wat een butt-weer.', 'Nou nou.', 'Tja.', 'Poe poe poe.', 'Diepe zucht.', 'Sjonge zeg.', 'Gaaaaaaaaaaaaaaap.' }
-local sDatabaseDomoticz = '/var/domoticz/domoticz.db'
+local sDatabaseDomoticz = '/home/bob/domoticz-data/domoticz.db'
 local sZonnepanelenDeviceName = 'Zonnepanelen'
 local sEigenVerbruikDeviceName = 'Eigen Verbruik'
 ---------------------------------------------------------------------------------------------------------------------------

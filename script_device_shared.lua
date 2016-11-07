@@ -1,6 +1,6 @@
 commandArray = {}
 
-package.path = package.path .. ';' .. '/var/domoticz/lua/?.lua'
+package.path = package.path .. ';' .. '/home/bob/domoticz/scripts/lua/?.lua'
 
 require "inc/functions"
 require "inc/sqlite3"
@@ -12,5 +12,6 @@ require "device_electra"
 require "device_verlichting"
 require "device_televisie"
 require "device_ventilatie"
+require "device_aanwezig"
 
 return commandArray

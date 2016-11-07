@@ -1,9 +1,9 @@
 if ( devicechanged['Voordeur Lamp'] == 'On' ) then
-	addCommand( 'Tuin Lampen', 'On' )
+	addCommand( 'Tuin Lampen', 'On FOR 0.5 SECONDS REPEAT -5 INTERVAL 0.5 SECONDS' )
 end
 
 if ( devicechanged['Voordeur Lamp'] == 'Off' ) then
-	addCommand( "Tuin Lampen", "Off" )
+	addCommand( 'Tuin Lampen', 'Off FOR 0.5 SECONDS REPEAT -5 INTERVAL 0.5 SECONDS' )
 end
 
 if ( devicechanged['$Achterdeur Sensor'] == 'Open' ) then
@@ -14,20 +14,20 @@ end
 
 if (
 	devicechanged['$Entree Sensor Activiteit'] == 'On'
-	or devicechanged['$Voordeur Sensor'] == 'Open' -- deur open
+	or devicechanged['$Voordeur Sensor'] == 'Open'
 ) then
 	if (
 		otherdevices['Entree Lamp'] == 'Off'
 		and tonumber( otherdevices_svalues['Entree Sensor Lichtsterkte'] ) < 25
 	) then
-		addCommand( "Entree Lamp", "On" )
+		addCommand( "Entree Lamp", 'On' )
 	end
 	if (
 		otherdevices['Woonkamer Lamp'] == 'Off'
 		and tonumber( otherdevices_svalues['Entree Sensor Lichtsterkte'] ) < 25
 	) then
 		if ( timeOffset( otherdevices_lastupdate['Woonkamer Lamp'] ) / 60 > 30 ) then
-			addCommand( 'Woonkamer Lamp', 'Set Level 5 AFTER 2' )
+			addCommand( 'Woonkamer Lamp', 'Set Level 5 AFTER 3 SECONDS' )
 		end
 	end
 	if (
@@ -35,14 +35,15 @@ if (
 		and otherdevices['Voordeur Lamp'] == 'On'
 		and ( oDatetime.hour >= 5 and oDatetime.hour <= 9 )
 	) then
-		addCommand( 'Tuin Lampen', 'On' )
+		addCommand( 'Tuin Lampen', 'On AFTER 10 SECONDS FOR 0.5 SECONDS REPEAT -5 INTERVAL 0.5 SECONDS' )
 	end
 end
 
-if ( devicechanged['$Entree Sensor Activiteit'] == 'Off' ) then
-	if ( otherdevices['Entree Lamp'] == 'On' ) then
-		addCommand( 'Entree Lamp', 'Off' )
-	end
+if (
+	devicechanged['$Entree Sensor Activiteit'] == 'Off'
+	and otherdevices['Entree Lamp'] == 'On'
+) then
+	addCommand( 'Entree Lamp', 'Off FOR 0.5 SECONDS REPEAT -3 INTERVAL 0.5 SECONDS' )
 end
 
 if (
@@ -102,11 +103,11 @@ if (
 		)
 	) then
 		if ( otherdevices['$Woonkamer Bank Lamp'] == 'Off' ) then
-			addCommand( '$Woonkamer Bank Lamp', 'On', 2, 2 )
+			addCommand( '$Woonkamer Bank Lamp', 'On REPEAT 3 INTERVAL 2 SECONDS RANDOM 2 SECONDS' )
 		end
 	else
 		if ( otherdevices['$Woonkamer Bank Lamp'] == 'On' ) then
-			addCommand( '$Woonkamer Bank Lamp', 'Off', 2, 2 )
+			addCommand( '$Woonkamer Bank Lamp', 'Off REPEAT 3 INTERVAL 2 SECONDS RANDOM 2 SECONDS' )
 		end
 	end
 end
