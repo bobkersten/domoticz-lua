@@ -1,6 +1,6 @@
 commandArray = {}
 
-package.path = package.path .. ';' .. '/home/bob/domoticz/scripts/lua/?.lua'
+package.path = package.path .. ';' .. '/home/bob/Projects/domoticz/scripts/lua/?.lua'
 
 require "inc/functions"
 require "inc/sqlite3"

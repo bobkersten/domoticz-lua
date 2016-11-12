@@ -170,6 +170,17 @@ function log( sMessage_, sPrefix_, bNotify_ )
 	return true -- allows chaining in if conditions
 end
 
+function exec( sCommand_, bRaw_ )
+	local f = assert( io.popen( sCommand_, 'r' ) )
+	local s = assert( f:read( '*a' ) )
+	f:close()
+	if bRaw_ then return s end
+	s = string.gsub( s, '^%s+', '' )
+	s = string.gsub( s, '%s+$', '' )
+	s = string.gsub( s, '[\n\r]+', ' ' )
+	return s
+end
+
 --  ____ ___                  ____   ____            .__      ___.   .__
 -- |    |   \______ __________\   \ /   /____ _______|__|____ \_ |__ |  |   ____   ______
 -- |    |   /  ___// __ \_  __ \   Y   /\__  \\_  __ \  \__  \ | __ \|  | _/ __ \ /  ___/

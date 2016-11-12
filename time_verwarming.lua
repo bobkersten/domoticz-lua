@@ -44,8 +44,8 @@
 ---------------------------------------------------------------------------------------------------------------------------
 -- Domoticz and Heating Database Locations
 ---------------------------------------------------------------------------------------------------------------------------
-local sDatabaseDomoticz = '/home/bob/domoticz-data/domoticz.db'																-- The location of the domoticz database
-local sDatabaseCustom = '/home/bob/domoticz-data/domoticz.custom.db'															-- The location of the custom database (where deltas are stored)
+local sDatabaseDomoticz = '/home/bob/Projects/domoticz-data/domoticz.db'											-- The location of the domoticz database
+local sDatabaseCustom = '/home/bob/Projects/domoticz-data/domoticz.custom.db'										-- The location of the custom database (where deltas are stored)
 ---------------------------------------------------------------------------------------------------------------------------
 -- Domoticz Device Names & Variables
 ---------------------------------------------------------------------------------------------------------------------------
